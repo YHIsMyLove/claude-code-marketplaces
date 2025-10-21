@@ -1,0 +1,16 @@
+{
+  "name": "Claude Code Plugin Marketplace",
+  "description": "Personal marketplace for Claude Code plugins and skills",
+  "version": "1.0.0",
+  "plugins": [
+    {
+      "name": "markdown-word-converter",
+      "description": "Convert Markdown files to Word documents with support for Mermaid diagrams, custom templates, and table of contents generation.",
+      "path": "skills/markdown-word-converter",
+      "skill_file": "SKILL.md"
+    }
+  ],
+  "author": "Claude Code Marketplace",
+  "license": "Apache 2.0",
+  "repository": "https://github.com/YHIsMyLove/claude-code-marketplaces"
+}
