@@ -80,6 +80,13 @@ python scripts/convert.py --test-mmdc
 ```
 This will verify that mmdc can actually convert diagrams, not just that the command exists.
 
+### Clean Up Temporary Files
+To automatically clean up intermediate files after conversion:
+```bash
+python scripts/convert.py input.md --cleanup-temp
+```
+By default, intermediate files are preserved for debugging purposes. Use this flag to automatically remove them.
+
 ## Workflow Process
 
 1. **Validate Input**: Check if the input Markdown file exists

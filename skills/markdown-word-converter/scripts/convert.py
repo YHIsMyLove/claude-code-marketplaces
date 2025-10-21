@@ -440,7 +440,7 @@ class MarkdownToWordConverter:
             print("Error: pandoc not found. Please install pandoc")
             return False
 
-    def convert_simple(self, input_file, template_path=None):
+    def convert_simple(self, input_file, template_path=None, cleanup_temp=False):
         """Simple conversion matching PowerShell script behavior exactly"""
         input_path = Path(input_file)
 
@@ -493,18 +493,22 @@ class MarkdownToWordConverter:
             print(f"Failed to convert to DOCX")
             return False
 
-        # Clean up intermediate file (as requested)
-        try:
-            output_md.unlink()
-            print(f"Cleaned up intermediate file: {output_md}")
-        except Exception as e:
-            print(f"Warning: Could not clean up {output_md}: {e}")
+        # Clean up intermediate file (optional, default False)
+        if cleanup_temp:
+            try:
+                output_md.unlink()
+                print(f"🧹 Cleaned up intermediate file: {output_md}")
+            except Exception as e:
+                print(f"⚠️  Warning: Could not clean up {output_md}: {e}")
+        else:
+            print(f"📄 Intermediate file preserved: {output_md}")
+            print(f"   You can manually delete it or use --cleanup-temp flag next time")
 
         print(f"Conversion completed successfully!")
         print(f"Output file: {output_docx}")
         return True
 
-    def convert(self, input_file, output_file=None, use_template=True):
+    def convert(self, input_file, output_file=None, use_template=True, cleanup_temp=False):
         """Main conversion function"""
         input_path = Path(input_file)
 
@@ -567,13 +571,16 @@ class MarkdownToWordConverter:
             print(f"\n📝 Step 2: Converting to Word document...")
             success = self.convert_to_docx(md_for_conversion, output_path, use_template)
 
-            # Clean up intermediate file
-            if mermaid_success and temp_md.exists():
+            # Clean up intermediate file (optional, default False)
+            if cleanup_temp and mermaid_success and temp_md.exists():
                 try:
                     temp_md.unlink()
                     print(f"🧹 Cleaned up intermediate file: {temp_md}")
                 except Exception as e:
                     print(f"⚠️  Warning: Could not clean up {temp_md}: {e}")
+            elif not cleanup_temp and mermaid_success:
+                print(f"📄 Intermediate file preserved: {temp_md}")
+                print(f"   You can manually delete it or use --cleanup-temp flag next time")
 
             if success:
                 print(f"\n🎉 Conversion completed successfully!")
@@ -708,6 +715,11 @@ def main():
         "--template",
         help="Specify template DOCX file path (default: ./template.docx in simple mode)"
     )
+    parser.add_argument(
+        "--cleanup-temp",
+        action="store_true",
+        help="Clean up intermediate temporary files after conversion (default: keep files)"
+    )
 
     args = parser.parse_args()
 
@@ -769,14 +781,16 @@ def main():
         # Simple PowerShell-style conversion
         success = converter.convert_simple(
             args.input_file,
-            template_path=args.template
+            template_path=args.template,
+            cleanup_temp=args.cleanup_temp
         )
     else:
         # Advanced conversion with all options
         success = converter.convert(
             args.input_file,
             args.output,
-            use_template=not args.no_template
+            use_template=not args.no_template,
+            cleanup_temp=args.cleanup_temp
         )
 
     sys.exit(0 if success else 1)
