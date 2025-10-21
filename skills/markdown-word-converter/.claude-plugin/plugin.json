@@ -1,0 +1,12 @@
+{
+  "name": "markdown-word-converter",
+  "description": "Convert Markdown files to Word documents with support for Mermaid diagrams, custom templates, and table of contents generation.",
+  "version": "1.1.0",
+  "license": "Apache 2.0",
+  "author": {
+    "name": "Claude Code Marketplace",
+    "email": "noreply@anthropic.com"
+  },
+  "repository": "https://github.com/YHIsMyLove/claude-code-marketplaces",
+  "keywords": ["markdown", "word", "conversion", "mermaid", "documentation"]
+}
