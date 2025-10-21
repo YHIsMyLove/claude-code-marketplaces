@@ -107,6 +107,43 @@ class MarkdownToWordConverter:
 
         return None
 
+    def _find_mmdc_in_path(self):
+        """Find mmdc in PATH environment variable by checking npm directories first"""
+        path_dirs = os.environ.get("PATH", "").split(os.pathsep)
+
+        # Prioritize npm-related directories in PATH
+        npm_paths = []
+        other_paths = []
+
+        for path_dir in path_dirs:
+            if "npm" in path_dir.lower():
+                npm_paths.append(path_dir)
+            else:
+                other_paths.append(path_dir)
+
+        # Check npm paths first
+        for path_dir in npm_paths:
+            # Try both mmdc and mmdc.cmd on Windows
+            mmdc_names = ["mmdc.cmd", "mmdc"] if platform.system() == "Windows" else ["mmdc"]
+
+            for mmdc_name in mmdc_names:
+                mmdc_path = Path(path_dir) / mmdc_name
+                if mmdc_path.exists() and mmdc_path.is_file():
+                    print(f"✅ Found mmdc in PATH npm directory: {mmdc_path}")
+                    return str(mmdc_path)
+
+        # Check other paths if not found in npm paths
+        for path_dir in other_paths:
+            mmdc_names = ["mmdc.cmd", "mmdc"] if platform.system() == "Windows" else ["mmdc"]
+
+            for mmdc_name in mmdc_names:
+                mmdc_path = Path(path_dir) / mmdc_name
+                if mmdc_path.exists() and mmdc_path.is_file():
+                    print(f"✅ Found mmdc in PATH: {mmdc_path}")
+                    return str(mmdc_path)
+
+        return None
+
     def _check_mmdc(self):
         """Check if mmdc is properly installed and functional with enhanced detection"""
         # Method 1: Use custom path if provided
@@ -116,18 +153,16 @@ class MarkdownToWordConverter:
             else:
                 print(f"Warning: Custom mmdc path not found: {self.mmdc_path}")
 
-        # Method 2: Standard PATH check
-        if shutil.which("mmdc"):
-            return self._test_mmdc_executable("mmdc")
-
-        # Method 3: Enhanced npm path detection
-        mmdc_path = self._find_mmdc_in_npm_paths()
+        # Method 2: Enhanced PATH check - prioritize npm directories
+        mmdc_path = self._find_mmdc_in_path()
         if mmdc_path:
-            print(f"Found mmdc at: {mmdc_path}")
             if self._test_mmdc_executable(mmdc_path):
-                # Store the found path for later use
                 self.mmdc_path = mmdc_path
                 return True
+
+        # Method 3: Standard PATH check (fallback)
+        if shutil.which("mmdc"):
+            return self._test_mmdc_executable("mmdc")
 
         # Method 4: Try common Windows paths directly (Windows specific)
         if platform.system() == "Windows":
@@ -145,7 +180,15 @@ class MarkdownToWordConverter:
                         self.mmdc_path = str(path)
                         return True
 
-        # Method 5: Try npm to run mmdc directly (last resort)
+        # Method 5: Enhanced npm path detection (using npm config)
+        mmdc_path = self._find_mmdc_in_npm_paths()
+        if mmdc_path:
+            print(f"Found mmdc via npm config: {mmdc_path}")
+            if self._test_mmdc_executable(mmdc_path):
+                self.mmdc_path = mmdc_path
+                return True
+
+        # Method 6: Try npm to run mmdc directly (last resort)
         try:
             result = subprocess.run(
                 ["npm", "run", "--silent", "mmdc", "--", "--version"],
@@ -169,6 +212,7 @@ class MarkdownToWordConverter:
             if isinstance(mmdc_cmd, str) and "npm run" in mmdc_cmd:
                 cmd = mmdc_cmd.split() + ["--version"]
             else:
+                # mmdc_cmd could be a command name or full path
                 cmd = [mmdc_cmd, "--version"]
 
             result = subprocess.run(
