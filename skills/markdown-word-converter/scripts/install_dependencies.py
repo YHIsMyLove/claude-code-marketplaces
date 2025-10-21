@@ -45,10 +45,11 @@ class DependencyInstaller:
             result = subprocess.run(
                 tool_info["check_cmd"].split(),
                 capture_output=True,
-                text=True
+                text=True,
+                timeout=5
             )
             return result.returncode == 0
-        except (FileNotFoundError, subprocess.SubprocessError):
+        except (FileNotFoundError, subprocess.SubprocessError, subprocess.TimeoutExpired):
             return False
 
     def check_all_dependencies(self):

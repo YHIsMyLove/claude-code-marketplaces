@@ -37,30 +37,14 @@ class MarkdownToWordConverter:
     def _check_mmdc(self):
         """Check if mmdc is properly installed and functional"""
         try:
-            # First check if mmdc command exists
-            if not shutil.which("mmdc"):
-                return False
-
-            # Then try to run mmdc --version to verify it's working
             result = subprocess.run(
                 ["mmdc", "--version"],
                 capture_output=True,
                 text=True,
-                timeout=10
+                timeout=5
             )
-
-            if result.returncode == 0:
-                print(f"✓ mmdc detected: {result.stdout.strip()}")
-                return True
-            else:
-                print(f"✗ mmdc found but not working: {result.stderr}")
-                return False
-
-        except subprocess.TimeoutExpired:
-            print("✗ mmdc command timed out")
-            return False
-        except (FileNotFoundError, subprocess.SubprocessError) as e:
-            print(f"✗ mmdc check failed: {e}")
+            return result.returncode == 0
+        except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.SubprocessError):
             return False
 
     def install_dependencies(self):
