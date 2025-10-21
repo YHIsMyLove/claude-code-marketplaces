@@ -73,6 +73,13 @@ To check if all dependencies are installed:
 python scripts/convert.py --check-deps
 ```
 
+### Test mmdc Functionality
+To test if mmdc is properly working for Mermaid diagram conversion:
+```bash
+python scripts/convert.py --test-mmdc
+```
+This will verify that mmdc can actually convert diagrams, not just that the command exists.
+
 ## Workflow Process
 
 1. **Validate Input**: Check if the input Markdown file exists
@@ -160,8 +167,11 @@ To use a custom Word template:
 - Use `--no-template` flag to skip template usage
 
 **Mermaid diagrams not converting**
-- Check that mmdc is properly installed
+- Run `python scripts/convert.py --test-mmdc` to diagnose issues
+- Check that mmdc is properly installed: `mmdc --version`
 - Verify Mermaid syntax in your Markdown
+- Ensure Chrome/Chromium is installed (required by mmdc)
+- Try reinstalling: `npm install -g @mermaid-js/mermaid-cli`
 - Use `--no-template` flag as a fallback
 
 ### Getting Help
