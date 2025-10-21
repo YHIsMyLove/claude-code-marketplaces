@@ -260,29 +260,27 @@ class MarkdownToWordConverter:
         return False
 
     def convert_mermaid_diagrams(self, input_file, output_file):
-        """Convert Mermaid diagrams using mmdc with enhanced path support"""
+        """Convert Mermaid diagrams using mmdc with enhanced path support (PowerShell style)"""
         try:
-            print(f"Converting Mermaid diagrams in {input_file}...")
+            print(f"Converting mermaid diagrams in {input_file}...")
 
-            # Build mmdc command based on detected path
+            # Build mmdc command based on detected path (matching PowerShell: -s 2 scale)
             if self.mmdc_path and "npm run" in self.mmdc_path:
                 # Use npm run command format
-                cmd = self.mmdc_path.split() + ["-i", str(input_file), "-o", str(output_file), "-e", "png"]
+                cmd = self.mmdc_path.split() + ["-i", str(input_file), "-o", str(output_file), "-e", "png", "-s", "2"]
             elif self.mmdc_path and os.path.isfile(self.mmdc_path):
                 # Use custom detected path
-                cmd = [self.mmdc_path, "-i", str(input_file), "-o", str(output_file), "-e", "png"]
+                cmd = [self.mmdc_path, "-i", str(input_file), "-o", str(output_file), "-e", "png", "-s", "2"]
             else:
                 # Use standard command (fallback)
-                cmd = ["mmdc", "-i", str(input_file), "-o", str(output_file), "-e", "png"]
+                cmd = ["mmdc", "-i", str(input_file), "-o", str(output_file), "-e", "png", "-s", "2"]
 
-            print(f"Running command: {' '.join(cmd)}")
-
-            # Run with longer timeout and better error handling
+            # Run with better error handling (simpler like PowerShell)
             result = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
-                timeout=60  # Increased timeout for complex diagrams
+                timeout=60
             )
 
             if result.returncode != 0:
@@ -413,22 +411,23 @@ class MarkdownToWordConverter:
         print("        2. Add npm global path to PATH environment variable")
         print("        3. Reinstall mermaid-cli: npm install -g @mermaid-js/mermaid-cli")
 
-    def convert_to_docx(self, input_file, output_file, use_template=True):
-        """Convert markdown to docx using pandoc"""
+    def convert_to_docx(self, input_file, output_file, use_template=True, template_path=None):
+        """Convert markdown to docx using pandoc (PowerShell style)"""
         try:
             print(f"Converting to DOCX: {output_file}...")
 
-            cmd = ["pandoc", str(input_file), "-o", str(output_file)]
-
-            # Add table of contents
-            cmd.append("--toc")
-
-            # Add template if available and requested
-            if use_template and self.template_docx.exists():
-                cmd.extend(["--reference-doc", str(self.template_docx)])
-                print(f"Using template: {self.template_docx}")
-            elif use_template:
-                print("Warning: Template file not found, using default styling")
+            # Build pandoc command (matching PowerShell style)
+            if template_path and Path(template_path).exists():
+                cmd = ["pandoc", str(input_file), "-o", str(output_file), "--toc", "--reference-doc", template_path]
+            elif use_template and self.template_docx.exists():
+                cmd = ["pandoc", str(input_file), "-o", str(output_file), "--toc", "--reference-doc", str(self.template_docx)]
+            else:
+                # Try local template first (like PowerShell), then fallback
+                local_template = Path(input_file).parent / "template.docx"
+                if local_template.exists():
+                    cmd = ["pandoc", str(input_file), "-o", str(output_file), "--toc", "--reference-doc", str(local_template)]
+                else:
+                    cmd = ["pandoc", str(input_file), "-o", str(output_file), "--toc"]
 
             result = subprocess.run(cmd, capture_output=True, text=True)
             if result.returncode != 0:
@@ -440,6 +439,70 @@ class MarkdownToWordConverter:
         except FileNotFoundError:
             print("Error: pandoc not found. Please install pandoc")
             return False
+
+    def convert_simple(self, input_file, template_path=None):
+        """Simple conversion matching PowerShell script behavior exactly"""
+        input_path = Path(input_file)
+
+        if not input_path.exists():
+            print(f"Error: File not found: {input_file}")
+            return False
+
+        # Ensure mmdc is available (use enhanced detection)
+        if not self.mmdc_path:
+            if not self._check_mmdc():
+                print("Error: mmdc not found. Please install mermaid-cli:")
+                print("  npm install -g @mermaid-js/mermaid-cli")
+                return False
+
+        # Generate filenames like PowerShell: basename.mmdc.md and basename.docx
+        base_name = input_path.stem
+        output_md = input_path.parent / f"{base_name}.mmdc.md"
+        output_docx = input_path.parent / f"{base_name}.docx"
+
+        print(f"Converting mermaid diagrams in {input_file}...")
+
+        # Convert mermaid diagrams (PowerShell style with enhanced path support)
+        if self.mmdc_path and "npm run" in self.mmdc_path:
+            cmd = self.mmdc_path.split() + ["-i", str(input_path), "-o", str(output_md), "-e", "png", "-s", "2"]
+        elif self.mmdc_path and os.path.isfile(self.mmdc_path):
+            cmd = [self.mmdc_path, "-i", str(input_path), "-o", str(output_md), "-e", "png", "-s", "2"]
+        else:
+            cmd = ["mmdc", "-i", str(input_path), "-o", str(output_md), "-e", "png", "-s", "2"]
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            print(f"Failed to convert mermaid diagrams")
+            return False
+
+        print(f"Converting to DOCX: {output_docx}...")
+
+        # Convert to DOCX (PowerShell style)
+        if template_path and Path(template_path).exists():
+            cmd = ["pandoc", str(output_md), "-o", str(output_docx), "--toc", "--reference-doc", template_path]
+        else:
+            # Use local template like PowerShell
+            local_template = input_path.parent / "template.docx"
+            if local_template.exists():
+                cmd = ["pandoc", str(output_md), "-o", str(output_docx), "--toc", "--reference-doc", str(local_template)]
+            else:
+                cmd = ["pandoc", str(output_md), "-o", str(output_docx), "--toc"]
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            print(f"Failed to convert to DOCX")
+            return False
+
+        # Clean up intermediate file (as requested)
+        try:
+            output_md.unlink()
+            print(f"Cleaned up intermediate file: {output_md}")
+        except Exception as e:
+            print(f"Warning: Could not clean up {output_md}: {e}")
+
+        print(f"Conversion completed successfully!")
+        print(f"Output file: {output_docx}")
+        return True
 
     def convert(self, input_file, output_file=None, use_template=True):
         """Main conversion function"""
@@ -625,6 +688,15 @@ def main():
         "--mmdc-path",
         help="Specify path to mmdc executable (useful if not in PATH)"
     )
+    parser.add_argument(
+        "--simple",
+        action="store_true",
+        help="Use simple PowerShell-style conversion (creates .mmdc.md intermediate file, then deletes it)"
+    )
+    parser.add_argument(
+        "--template",
+        help="Specify template DOCX file path (default: ./template.docx in simple mode)"
+    )
 
     args = parser.parse_args()
 
@@ -681,11 +753,20 @@ def main():
     if not args.input_file:
         parser.error("input_file is required when not using --check-deps or --test-mmdc")
 
-    success = converter.convert(
-        args.input_file,
-        args.output,
-        use_template=not args.no_template
-    )
+    # Choose conversion mode
+    if args.simple:
+        # Simple PowerShell-style conversion
+        success = converter.convert_simple(
+            args.input_file,
+            template_path=args.template
+        )
+    else:
+        # Advanced conversion with all options
+        success = converter.convert(
+            args.input_file,
+            args.output,
+            use_template=not args.no_template
+        )
 
     sys.exit(0 if success else 1)
 
