@@ -1,0 +1,22 @@
+{
+  "name": "claude-code-marketplaces",
+  "owner": {
+    "name": "YHIsMyLove",
+    "email": "YHIsMyLove@users.noreply.github.com"
+  },
+  "metadata": {
+    "description": "个人维护的 Claude Code 插件市场，包含实用的文档处理技能",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "document-processing",
+      "description": "文档处理技能包，包含 Markdown 转 Word 转换功能",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/markdown-word-converter"
+      ]
+    }
+  ]
+}
