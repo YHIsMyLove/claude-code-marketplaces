@@ -546,13 +546,12 @@ class MarkdownToWordConverter:
         output_path = Path(output_file)
         print(f"📄 Output will be saved to: {output_path}")
 
-        # Create temporary directory for intermediate files
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_path = Path(temp_dir)
-            print(f"📁 Using temporary directory: {temp_path}")
+        # Create intermediate file in current directory instead of temporary folder
+        temp_md = input_path.parent / f"{input_path.stem}_processed.md"
+        print(f"📁 Using intermediate file: {temp_md}")
 
+        try:
             # Step 1: Convert Mermaid diagrams
-            temp_md = temp_path / f"{input_path.stem}_processed.md"
             print("\n🎨 Step 1: Processing Mermaid diagrams...")
             mermaid_success = self.convert_mermaid_diagrams(input_path, temp_md)
 
@@ -567,6 +566,14 @@ class MarkdownToWordConverter:
             # Step 2: Convert to DOCX
             print(f"\n📝 Step 2: Converting to Word document...")
             success = self.convert_to_docx(md_for_conversion, output_path, use_template)
+
+            # Clean up intermediate file
+            if mermaid_success and temp_md.exists():
+                try:
+                    temp_md.unlink()
+                    print(f"🧹 Cleaned up intermediate file: {temp_md}")
+                except Exception as e:
+                    print(f"⚠️  Warning: Could not clean up {temp_md}: {e}")
 
             if success:
                 print(f"\n🎉 Conversion completed successfully!")
@@ -592,6 +599,10 @@ class MarkdownToWordConverter:
                 print(f"   • Try converting without template: --no-template")
                 print(f"   • Verify file permissions for output directory")
                 return False
+
+        except Exception as e:
+            print(f"\n❌ Unexpected error during conversion: {e}")
+            return False
 
 
 def test_mmdc_functionality(mmdc_path=None):
