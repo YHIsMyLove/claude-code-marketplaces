@@ -36,9 +36,17 @@ def convert_mermaid(input_file, output_file):
         raise RuntimeError(f"{mmdc_name} 命令未找到，请安装 mermaid-cli: npm install -g @mermaid-js/mermaid-cli")
 
 
-def convert_to_docx(input_file, output_file):
+def convert_to_docx(input_file, output_file, template_file=None):
     """第二步：使用 pandoc 转换为 docx"""
     cmd = ['pandoc', str(input_file), '-o', str(output_file), '--toc']
+
+    # 添加模板支持
+    if template_file and Path(template_file).exists():
+        cmd.extend(['--reference-doc', str(template_file)])
+        print(f"✓ 使用模板文件: {template_file}")
+    elif Path('assets/template.docx').exists():
+        cmd.extend(['--reference-doc', 'assets/template.docx'])
+        print("✓ 使用默认模板: assets/template.docx")
 
     try:
         subprocess.run(cmd, check=True, capture_output=True, text=True)
@@ -49,7 +57,7 @@ def convert_to_docx(input_file, output_file):
         raise RuntimeError("pandoc 命令未找到，请安装 pandoc: https://pandoc.org/installing.html")
 
 
-def convert(input_file, output_file=None):
+def convert(input_file, output_file=None, template_file=None):
     """主转换函数：协调两步转换流程"""
     input_path = Path(input_file)
 
@@ -77,13 +85,13 @@ def convert(input_file, output_file=None):
         convert_mermaid(input_path, intermediate_md)
 
         # 第二步：转换为 docx
-        convert_to_docx(intermediate_md, output_path)
+        convert_to_docx(intermediate_md, output_path, template_file)
 
         print(f"📄 中间文件已保留: {intermediate_md}")
     else:
         print("未检测到 Mermaid 图表，直接转换...")
         # 直接转换
-        convert_to_docx(input_path, output_path)
+        convert_to_docx(input_path, output_path, template_file)
 
     print(f"🎉 转换完成! 输出文件: {output_path}")
     return str(output_path)
@@ -103,11 +111,12 @@ def main():
 
     parser.add_argument('input_file', help='输入的 Markdown 文件 (.md)')
     parser.add_argument('output_file', nargs='?', help='输出的 Word 文件 (.docx，可选)')
+    parser.add_argument('--template', help='Word 模板文件 (.docx，可选)')
 
     args = parser.parse_args()
 
     try:
-        convert(args.input_file, args.output_file)
+        convert(args.input_file, args.output_file, args.template)
     except Exception as e:
         print(f"❌ 错误: {e}", file=sys.stderr)
         sys.exit(1)
