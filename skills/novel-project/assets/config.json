@@ -1,0 +1,107 @@
+{
+  "name": "novel-project",
+  "version": "1.0.0",
+  "description": "小说工程创建和章节管理配置文件",
+  "author": "Claude Code",
+  "license": "Apache 2.0",
+  "project_settings": {
+    "project_suffix": "_project",
+    "encoding": "utf-8",
+    "create_readme": true,
+    "create_assets": true
+  },
+  "directory_structure": {
+    "database_folders": [
+      "参考资料",
+      "背景设定",
+      "人物设定",
+      "写作风格",
+      "主线-支线-进度"
+    ],
+    "chapter_count": 3,
+    "chapter_prefix": ""
+  },
+  "templates": {
+    "character_fields": [
+      "姓名",
+      "年龄",
+      "性别",
+      "职业",
+      "外貌特征",
+      "性格特点",
+      "背景故事",
+      "目标动机",
+      "能力特长",
+      "缺点弱点"
+    ],
+    "plot_structure": {
+      "acts": 3,
+      "chapters_per_act": 5,
+      "plot_points": [
+        "开端",
+        "发展",
+        "转折",
+        "高潮",
+        "结局"
+      ]
+    },
+    "chapter_template": {
+      "sections": [
+        "章节大纲",
+        "场景设置",
+        "对话要点",
+        "正文",
+        "章节检查",
+        "作者备注"
+      ],
+      "word_count_target": 3000,
+      "include_writing_tips": true
+    }
+  },
+  "chapter_management": {
+    "auto_renumber": true,
+    "update_progress": true,
+    "backup_on_change": false,
+    "validate_sequence": true
+  },
+  "writing_assistance": {
+    "auto_save_interval": 300,
+    "word_count_warnings": {
+      "min": 500,
+      "max": 10000
+    },
+    "include_checklist": true,
+    "writing_tips": true
+  },
+  "file_formats": {
+    "chapter_extension": ".md",
+    "database_extension": ".md",
+    "encoding": "utf-8",
+    "line_endings": "auto"
+  },
+  "defaults": {
+    "novel_genres": [
+      "玄幻",
+      "仙侠",
+      "都市",
+      "历史",
+      "科幻",
+      "悬疑",
+      "言情",
+      "武侠"
+    ],
+    "point_of_view": "第三人称",
+    "tense": "过去时",
+    "narrative_style": "描写型"
+  },
+  "advanced": {
+    "git_integration": false,
+    "cloud_sync": false,
+    "collaboration": false,
+    "export_formats": [
+      "markdown",
+      "word",
+      "pdf"
+    ]
+  }
+}

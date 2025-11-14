@@ -8,6 +8,12 @@
       "description": "Convert Markdown files to Word documents with support for Mermaid diagrams, custom templates, and table of contents generation.",
       "path": "skills/markdown-word-converter",
       "skill_file": "SKILL.md"
+    },
+    {
+      "name": "novel-project",
+      "description": "Create structured novel project templates with character development tools, chapter management, and writing assistance features.",
+      "path": "skills/novel-project",
+      "skill_file": "SKILL.md"
     }
   ],
   "author": "Claude Code Marketplace",
