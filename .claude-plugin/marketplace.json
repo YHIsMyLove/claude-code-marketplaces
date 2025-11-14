@@ -17,6 +17,15 @@
       "skills": [
         "./skills/markdown-word-converter"
       ]
+    },
+    {
+      "name": "novel-project",
+      "description": "小说工程创建技能，支持标准化小说目录结构和章节管理",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/novel-project"
+      ]
     }
   ]
 }
