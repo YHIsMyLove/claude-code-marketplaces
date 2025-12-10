@@ -1,0 +1,27 @@
+{
+  "name": "novel-project-generator",
+  "version": "1.0.0",
+  "description": "Novel project structure generator",
+  "main": "scripts/generate-novel-project.ts",
+  "scripts": {
+    "start": "bun run scripts/generate-novel-project.ts",
+    "dev": "bun --watch scripts/generate-novel-project.ts",
+    "build": "bun build scripts/generate-novel-project.ts --outdir dist --target node"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "keywords": [
+    "novel",
+    "writing",
+    "project-structure",
+    "typescript",
+    "bun"
+  ],
+  "author": "Claude Code",
+  "license": "MIT"
+}
