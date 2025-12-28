@@ -1,0 +1,28 @@
+[project]
+name = "web-fetch"
+version = "1.0.0"
+description = "Web page content extractor using Trafilatura"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Claude Code Marketplace"}
+]
+keywords = ["web-scraping", "content-extraction", "trafilatura", "markdown"]
+
+dependencies = [
+    "trafilatura>=1.6.0",
+]
+
+[project.scripts]
+web-fetch = "scripts.cli:main"
+
+[dependency-groups]
+dev = []
+
+[tool.hatch.build.targets.wheel]
+packages = ["scripts"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

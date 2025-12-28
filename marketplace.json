@@ -14,6 +14,12 @@
       "description": "Create structured novel project templates with character development tools, chapter management, and writing assistance features.",
       "path": "skills/novel-project",
       "skill_file": "SKILL.md"
+    },
+    {
+      "name": "web-fetch",
+      "description": "Extract and convert web page content to clean Markdown format with metadata. Uses Trafilatura library for intelligent content extraction and UV for fast dependency management.",
+      "path": "skills/web-fetch",
+      "skill_file": "SKILL.md"
     }
   ],
   "author": "Claude Code Marketplace",
